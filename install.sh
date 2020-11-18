@@ -29,6 +29,7 @@ brew install curl
 brew install php@7.4
 brew install composer
 brew install node
+brew install gnupg
 
 # BDD
 brew tap mongodb/brew
