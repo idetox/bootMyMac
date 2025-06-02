@@ -1,0 +1,44 @@
+name: Notify Teams on PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify-teams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send notification to Teams
+        uses: fjogeleit/http-request-action@v1.15.1
+        with:
+          url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          method: POST
+          contentType: application/json
+          data: |
+            {
+              "@type": "MessageCard",
+              "@context": "https://schema.org/extensions",
+              "summary": "Nouvelle Pull Request",
+              "themeColor": "0076D7",
+              "title": "📌 Nouvelle Pull Request créée",
+              "sections": [{
+                "activityTitle": "**${{ github.actor }}** a ouvert une pull request",
+                "activitySubtitle": "[#${{ github.event.pull_request.number }}] ${{ github.event.pull_request.title }}",
+                "facts": [
+                  {
+                    "name": "Repository",
+                    "value": "${{ github.repository }}"
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.event.pull_request.head.ref }}"
+                  },
+                  {
+                    "name": "Lien",
+                    "value": "[Voir la PR](${{ github.event.pull_request.html_url }})"
+                  }
+                ],
+                "markdown": true
+              }]
+            }
