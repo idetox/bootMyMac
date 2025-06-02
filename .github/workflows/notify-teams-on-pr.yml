@@ -17,28 +17,44 @@ jobs:
           contentType: application/json
           data: |
             {
-              "@type": "MessageCard",
-              "@context": "https://schema.org/extensions",
-              "summary": "Nouvelle Pull Request",
-              "themeColor": "0076D7",
-              "title": "📌 Nouvelle Pull Request créée",
-              "sections": [{
-                "activityTitle": "**${{ github.actor }}** a ouvert une pull request",
-                "activitySubtitle": "[#${{ github.event.pull_request.number }}] ${{ github.event.pull_request.title }}",
-                "facts": [
-                  {
-                    "name": "Repository",
-                    "value": "${{ github.repository }}"
-                  },
-                  {
-                    "name": "Branch",
-                    "value": "${{ github.event.pull_request.head.ref }}"
-                  },
-                  {
-                    "name": "Lien",
-                    "value": "[Voir la PR](${{ github.event.pull_request.html_url }})"
+              "type": "message",
+              "attachments": [
+                {
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                  "contentUrl": null,
+                  "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.4",
+                    "body": [
+                      {
+                        "type": "TextBlock",
+                        "text": "📌Nouvelle Pull Request by ${{ github.actor }}",
+                        "weight": "Bolder",
+                        "size": "Large"
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [
+                          {
+                            "title": "Title:",
+                            "value": "${{ github.event.pull_request.title }}"
+                          },
+                          {
+                            "title": "Branch:",
+                            "value": "${{ github.event.pull_request.head.ref }}"
+                          },
+                        ]
+                      },
+                      "actions": [
+                        {
+                          "type": "Action.OpenUrl",
+                          "url": "${{ github.event.pull_request.html_url }}",
+                          "title": "Voir la Pull request"
+                        }
+                      ]
+                    ]
                   }
-                ],
-                "markdown": true
-              }]
+                }
+              ]
             }
