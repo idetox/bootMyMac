@@ -1,3 +1,5 @@
+test
+
 # INSTALL MY MAC
 
 Download install.sh file and run
