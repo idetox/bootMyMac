@@ -6,3 +6,4 @@ $ ./install.sh
 ```
 
 then remove install.sh file
+test notification
