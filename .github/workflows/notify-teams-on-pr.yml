@@ -8,9 +8,21 @@ jobs:
   notify-teams:
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch prefix
+        id: extract_prefix
+        run: |
+          # Extract prdt-<number> prefix from branch name like prdt-123-anything
+          branch="${{ github.event.pull_request.head.ref }}"
+          # Use regex to capture prdt-NNN
+          if [[ "$branch" =~ ^(PRDT-[0-9]+|FIRE-[0-9]+) ]]; then
+            echo "prefix=https://ibanfirst.atlassian.net/browse/${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else
+            echo "prefix=https://ibanfirst.atlassian.net/jira/software/c/projects/PRDT/boards/151" >> $GITHUB_OUTPUT
+          fi
       - name: Send notification to Teams
         env:
           TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          PREFIX: ${{ steps.extract_prefix.outputs.prefix }}
         run: |
           curl -H "Content-Type: application/json" -d '{
             "type": "message",
@@ -23,10 +35,34 @@ jobs:
                   "version": "1.4",
                   "body": [
                     {
-                        "type": "TextBlock",
-                        "text": "New pull request by ${{ github.actor }} 🚀🚀🚀",
-                        "weight": "Bolder",
-                        "size": "Large"
+                      "type": "ColumnSet",
+                      "columns": [
+                        {
+                          "type": "Column",
+                          "width": "auto",
+                          "items": [
+                            {
+                              "type": "Image",
+                              "url": "${{ github.event.pull_request.user.avatar_url }}",
+                              "size": "Small",
+                              "style": "Person"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Column",
+                          "width": "stretch",
+                          "items": [
+                            {
+                              "type": "TextBlock",
+                              "text": "New pull request by ${{ github.actor }} 🚀",
+                              "weight": "Bolder",
+                              "size": "Large",
+                              "wrap": true
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "FactSet",
@@ -57,10 +93,15 @@ jobs:
                     {
                       "type": "Action.OpenUrl",
                       "url": "${{ github.event.pull_request.html_url }}",
-                      "title": "Voir la Pull request"
+                      "title": "Open pull request"
+                    },
+                    {
+                      "type": "Action.OpenUrl",
+                      "url": "'"$PREFIX"'",
+                      "title": "View ticket"
                     }
                   ]
-                },
+                }
               }
             ]
           }' $TEAMS_WEBHOOK
