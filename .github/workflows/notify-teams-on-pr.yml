@@ -41,15 +41,26 @@ jobs:
                         }
                       ]
                     },
-                    "actions": [
-                      {
-                        "type": "Action.OpenUrl",
-                        "url": "${{ github.event.pull_request.html_url }}",
-                        "title": "Voir la Pull request"
-                      }
-                    ]
+                    {
+                      "type": "TextBlock",
+                      "text": "Description:",
+                      "weight": "Bolder",
+                      "spacing": "Medium"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "${{ github.event.pull_request.body }}",
+                      "wrap": true
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "Action.OpenUrl",
+                      "url": "${{ github.event.pull_request.html_url }}",
+                      "title": "Voir la Pull request"
+                    }
                   ]
-                }
+                },
               }
             ]
           }' $TEAMS_WEBHOOK
